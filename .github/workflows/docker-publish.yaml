@@ -1,0 +1,19 @@
+name: Build and Push Frontend
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: npm ci
+    - run: npm run build
+    - run: docker build -t ghcr.io/mankinimbom/frontend:1.0.0 .
+    - run: echo "$CR_PAT" | docker login ghcr.io -u mankinimbom --password-stdin
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
+    - run: docker push ghcr.io/mankinimbom/frontend:1.0.0
